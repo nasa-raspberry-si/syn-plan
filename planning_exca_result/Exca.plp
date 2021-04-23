@@ -1,0 +1,43 @@
+// The following PLEXIL codes are automatically generated during planning.
+
+#include "plan-interface.h"
+
+
+Exca:
+{
+	log_info ("{'sel_xloc': {u'sci_val': 0.14171856014051243, u'position': {u'y': 0.0, u'x': 1.55}, u'ex_prob': 0.943312575943795}, 'sel_dloc': {u'position': {u'y': -0.8, u'x': 1.47}}, 'node_name': 'Exca'}");
+
+	log_info ("Unstowing arm...");
+	LibraryCall Unstow();
+
+	log_info ("A guarded move to find out the ground position of the location (x=1.55, y=0.0)...");
+	LibraryCall GuardedMove (
+		X = 1.55, Y = 0.0, Z = 0.05,
+		DirX = 0, DirY = 0, DirZ = 1,
+		SearchDistance = 0.25);
+
+	if (Lookup(GroundFound)) {
+		log_info ("Start the excavation using the grind at {u'sci_val': 0.14171856014051243, u'position': {u'y': 0.0, u'x': 1.55}, u'ex_prob': 0.943312575943795}...");
+		LibraryCall Grind (
+			X = 1.55, Y = 0.0, Depth = 0.05,
+			Length = 0.2, Parallel = true,
+			GroundPos = Lookup(GroundPosition));
+
+		log_info ("Removing tailing...\n\tCollecting the tailing using the scoop...\n");
+		LibraryCall DigCircular (
+			X = 1.55, Y = 0.0, Depth = 0.05,
+			GroundPos = Lookup(GroundPosition),
+			Parallel = true);
+
+		log_info ("\tMoving the tailing to {u'position': {u'y': -0.8, u'x': 1.47}}");
+		LibraryCall DeliverSample (X = 1.47, Y = -0.8, Z = 0.5);
+
+	}
+	else log_error ("Failed to find ground: skipping grind and dig.");
+	endif
+
+	log_info ("Stowing arm...");
+	LibraryCall Stow();
+
+	log_info ("Excavation is finished.");
+}
