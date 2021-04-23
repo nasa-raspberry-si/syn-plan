@@ -13,7 +13,7 @@
 ### Result
 Inside the resulting directory, **planning_exca_result**, there are
    * Synthesized run-time information for the excavation scenarion in **rt_info.json**.
-   * Automatically generated PRISM model, **ow_10xloc_6dloc.prism**.
+   * Automatically generated PRISM model, **ow_8xloc_6dloc.prism**.
    * Extracted Prism policy in **policy.adv**.
    * The PLEXIL plan **Exca.plp** translated from the Prism policy above.
 
