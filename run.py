@@ -89,33 +89,40 @@ def syn_exca_plan(
 
 #########################
 def parse_arguments(parser):
-    parser.add_argument("--runtime_info_fp", type=str, required=True, help="the path of run-time information")
+    parser.add_argument("--runtime_info_filename", type=str, required=True, help="the path of run-time information")
     parser.add_argument("--result_dir", type=str, required=True, help="the directory for holding all results")
-    parser.add_argument("--prism_model_name", type=str, required=True, help="the name of the prism model")
+    parser.add_argument("--prism_model_filename", type=str, required=True, help="the name of the prism model")
     parser.add_argument("--prism_property_filename", type=str, required=True, help="the name of the prism property file")
+    parser.add_argument("--prism_preprocessor_filename", type=str, required=True, help="the name of the prism preprocessor file")
     parser.add_argument("--xloc_num", type=int, required=True, help="the number of excavation locations")
     parser.add_argument("--dloc_num", type=int, required=True, help="the number of dump locations")
     args = parser.parse_args()
 
     args_dict = vars(args)
 
+    return args_dict
 
 def main(argv):
-    print("args: " + str(argv) + "\n")
+    parser    = ArgumentParser()
+    args_dict = parse_arguments(parser)
+    print("Args:")
+    print(args_dict)
+    print("\n")
 
-    runtime_info_fp = argv[0]
-    xloc_num = int(argv[1])
-    dloc_num = int(argv[2])
-    result_dir = argv[3]
-    prism_model_filename = argv[4]
-    prism_preprocessor_filename = argv[5]
-    prism_property_filename = argv[6]
+    runtime_info_filename = args_dict['runtime_info_filename']
+    xloc_num = args_dict['xloc_num']
+    dloc_num = args_dict['dloc_num']
+    result_dir = args_dict['result_dir']
+    prism_model_filename = args_dict['prism_model_filename']
+    prism_preprocessor_filename = args_dict['prism_preprocessor_filename']
+    prism_property_filename = args_dict['prism_property_filename']
 
     syn_exca_plan(
-            runtime_info_fp, xloc_num, dloc_num,
+            runtime_info_filename, xloc_num, dloc_num,
             result_dir, prism_model_filename,
             prism_preprocessor_filename, prism_property_filename,
             max_tried=1)
+
 
 if __name__ == "__main__":
     main(sys.argv[1:])
