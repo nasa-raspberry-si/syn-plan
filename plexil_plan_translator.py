@@ -30,7 +30,7 @@ class PlexilPlanTranslator():
 
     # prism_syn_plan: [action1, action2, ...]
     # plexil_plan_name is the name of the plexil node.
-    def translate(self, scenario_ID, runtime_info, plexil_plan_name, plexil_plan_dir, prism_syn_plan):
+    def translate(self, scenario_ID, runtime_info, plexil_plan_name, plexil_plan_dir, prism_syn_plan, faults):
         scenario = self.scenarios_map[scenario_ID]
         # Parse prism_syn_plan
         print("Parsing the synthesized plan by PRISM...")
@@ -39,7 +39,7 @@ class PlexilPlanTranslator():
 
         # Generate the PLEXIL code
         print("Generating the PLEXIL code...")
-        code = self.generate_code(scenario, plan_info)
+        code = self.generate_code(scenario, plan_info, faults)
 
         plexil_plan_fp = os.path.join(plexil_plan_dir, plexil_plan_name+".plp") 
         with open(plexil_plan_fp, "w") as outfile:
@@ -67,9 +67,9 @@ class PlexilPlanTranslator():
         sel_dloc = runtime_info['dloc_list'][sel_dloc_ID]
         print("[Synthesized Excavation Plan]:")
         
-        print(">>> " + sel_xloc_ID + ":")
+        print(">>> selected excavation location: " + sel_xloc["name"] + ":")
         print(json.dumps(sel_xloc, indent=4, sort_keys=True))
-        print(">>> " + sel_dloc_ID + ":")
+        print(">>> selected dump location: " + sel_dloc["name"] + ":")
         print(json.dumps(sel_dloc, indent=4, sort_keys=True))
         
         plan_info['sel_xloc'] = sel_xloc
@@ -78,16 +78,16 @@ class PlexilPlanTranslator():
 
 
     # [Section: PLEXIL Code Generation]
-    def generate_code(self, scenario, plan_info):
+    def generate_code(self, scenario, plan_info, faults):
         code = ""
         if scenario == Scenario.EXCAVATION:
-            code = self.gen_exca_scenario(plan_info)
+            code = self.gen_exca_scenario(plan_info, faults)
         else:
             print("[Plan Translation] Unknown scenario: " + scenario_ID)
         return code
 
     # Excavation
-    def gen_exca_scenario(self, plan_info):
+    def gen_exca_scenario(self, plan_info, faults):
         node_name = plan_info["node_name"]
         sel_xloc = plan_info["sel_xloc"]
         sel_dloc = plan_info["sel_dloc"]
@@ -98,27 +98,57 @@ class PlexilPlanTranslator():
         dloc_x = sel_dloc['position']['x']
         dloc_y = sel_dloc['position']['y']
 
+        plan_status_varname = "planSuccess"
+
+        faulty_ex_prob = -1
+        if len(faults) != 0:
+            faulty_ex_prob = faults['excavation']['ex_prob']
+
         print("Generating the PLEXIL code for excavation scenario...")
         code = ""
         code += self.gen_plan_desc()
         code += self.gen_include_files(Scenario.EXCAVATION)
         code += node_name + ":\n"
         code += "{\n"
+
+        # ToDo: implement gen_variables() to handel variable declarations
+        code += "\tBoolean " + plan_status_varname + ";\n\n"
+
         code += self.gen_plan_info(1, plan_info)
+
+        # Simulate the fault introduced into the excavatability
+        if (faulty_ex_prob >=0 ) and (faulty_ex_prob <= 1):
+            msg = "[Fault Injection] A fault has been introduced to the model that esitmate the excavatability. The actual excavatability is " + str(faulty_ex_prob) + " while it is estimated to be " + str(xloc_ep) + "."
+            code += self.gen_info(1, msg=msg)
+            xloc_ep = faulty_ex_prob
+
         code += self.gen_unstow(1)
         code += self.gen_guarded_move(1, xloc_x, xloc_y)
 
         msg = "Start the excavation using the grind at " + str(sel_xloc) + "..."
         body_code = self.gen_grind(2, xloc_x, xloc_y, msg=msg)
+
+        body_code_ds = ""
         msg = "Removing tailing...\\n\\tCollecting the tailing using the scoop...\\n"
-        body_code += self.gen_dig_circular(2, xloc_x, xloc_y, msg=msg)
+        body_code_ds += self.gen_dig_circular(3, xloc_x, xloc_y, msg=msg)
         msg = "\\tMoving the tailing to " + str(sel_dloc)
-        body_code += self.gen_deliver_sample(2, dloc_x, dloc_y, msg=msg)
+        body_code_ds += self.gen_deliver_sample(3, dloc_x, dloc_y, msg=msg)
+           
+        msg = "Digging failed."
+        dig_success_condition = "Lookup(DiggingSuccess(" + str(xloc_ep) + "))"
+        body_code += self.gen_dig_success_cond(2, dig_success_condition, plan_status_varname, body_code_ds, msg=msg)
+ 
+        msg = "Skipping grind and dig."
+        ground_found_cond = "Lookup(GroundFound)"
+        code += self.gen_ground_found_cond(1, body_code, ground_found_cond, plan_status_varname, msg=msg)
 
-        msg = "skipping grind and dig."
-        code += self.gen_ground_found_cond(1, body_code, msg=msg)
-
-        code += self.gen_stow(1)
+        #code += self.gen_stow(1)
+        update_node_name = "ExcavationStatus"
+        update_msg = {}
+        # ToDo: handel literals and variables appropriately
+        update_msg['plan_name'] = "\""+node_name+"\"" # a string literal in plexil plan
+        update_msg['exec_status'] = plan_status_varname # a variable in plexil plan
+        code += self.gen_update_node(1, update_node_name, update_msg)
         code += "\tlog_info (\"Excavation is finished.\");\n"
         code += "}\n"
 
@@ -165,13 +195,33 @@ class PlexilPlanTranslator():
 
         return self.__ident_code(code, pre_dents)
 
-    def gen_ground_found_cond(self, tab_num, body_code, msg=""):
-        pre_dents = self.__gen_ident_str(tab_num)
-        code = pre_dents + "if (Lookup(GroundFound)) {\n"
+    def gen_ground_found_cond(self, tab_num, body_code, condition, plan_status_varname, msg=""):
+        pre_dents = self.__gen_ident_str(tab_num) 
+        code = pre_dents + plan_status_varname + "=" + condition + ";\n"
+        code += pre_dents + "if (" + plan_status_varname + ") {\n"
+ 
+        #code = pre_dents + "if (Lookup(GroundFound)) {\n"
         code += body_code
         code += pre_dents + "}\n"
 
         code += pre_dents + "else log_error (\"Failed to find ground"
+        if msg != "":
+            code += ": " + msg
+        code += "\");\n"
+        
+        code += pre_dents + "endif\n\n"
+
+        return code
+
+    def gen_dig_success_cond(self, tab_num, condition, plan_status_varname, body_code, msg=""):
+        pre_dents = self.__gen_ident_str(tab_num)
+        code = pre_dents + plan_status_varname + "=" + condition + ";\n"
+        code += pre_dents + "if (" + plan_status_varname + ") {\n"
+        code += pre_dents + "\tlog_info (\"Digging successed!\");\n"
+        code += body_code
+        code += pre_dents + "}\n"
+
+        code += pre_dents + "else log_error (\"[Condition Failed] " + condition
         if msg != "":
             code += ": " + msg
         code += "\");\n"
@@ -220,6 +270,27 @@ class PlexilPlanTranslator():
         
         return self.__ident_code(code, pre_dents)
 
+    # Currently only support the Update statement in the Update node
+    # Input:
+    #   update_msg: a dict of messages, each of which has the format 'variable_name=value' in the Update Statement
+    def gen_update_node(self, tab_num, update_node_name, update_msg):
+        pre_dents = self.__gen_ident_str(tab_num)
+        code = []
+        code.append(update_node_name+":\n")
+        code.append("{\n")
+        cnt = 0
+        update_content = "\tUpdate "
+        for variable_key in update_msg:
+            if cnt != 0:
+                update_content += ", "
+            update_content += variable_key + "=" + update_msg[variable_key]
+            cnt += 1
+        update_content += ";\n"
+        code.append(update_content)
+        code.append("}\n\n")
+        
+        return self.__ident_code(code, pre_dents)
+
 
     # [Section: utility functions]
     #
@@ -242,6 +313,11 @@ class PlexilPlanTranslator():
     def __gen_ident_str(self, tab_num):
         return "\t"*tab_num
 
+    def gen_info(self, tab_num, msg=""):
+        code = ["log_info (\"" + msg + "\");\n"]
+        pre_dents = self.__gen_ident_str(tab_num)
+        return self.__ident_code(code, pre_dents)
+
 ##################
 def main(argv):
 	print("args:"+str(argv))
@@ -257,11 +333,12 @@ def main(argv):
         # The testing value of prism_syn_plan below
         # is for the execavation secnario.
         prism_syn_plan = "[select_xloc1, select_dloc1]"
+        faults = {}
 
         plexil_plan_translator.translate(
                 scenario_ID, runtime_info,
                 plexil_plan_name, plexil_plan_dir,
-                prism_syn_plan)
+                prism_syn_plan, faults)
 
 
 if __name__ == "__main__":
