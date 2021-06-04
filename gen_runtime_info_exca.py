@@ -85,6 +85,7 @@ class RuntimeInfoExcaGenerator():
         for xloc, loc_idx in zip(xloc_list, range(1, xloc_num+1)):
             xloc_ID = "xloc"+str(loc_idx)
             xloc_obj = {
+                    "name": xloc_ID,
                     "position": {"x":xloc[0], "y":xloc[1]},
                     "sci_val": sci_vals[loc_idx-1],
                     "ex_prob": ex_probs[loc_idx-1]
@@ -95,6 +96,7 @@ class RuntimeInfoExcaGenerator():
         for dloc, loc_idx in zip(dloc_list, range(1, dloc_num+1)):
             dloc_ID = "dloc"+str(loc_idx)
             dloc_obj = {
+                    "name": dloc_ID,
                     "position": {"x":dloc[0], "y":dloc[1]},
                     }
             runtime_info["dloc_list"][dloc_ID] = dloc_obj
