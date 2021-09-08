@@ -132,7 +132,7 @@ class PlexilPlanTranslator():
         msg = "Removing tailing...\\n\\tCollecting the tailing using the scoop...\\n"
         body_code_ds += self.gen_dig_circular(3, xloc_x, xloc_y, msg=msg)
         msg = "\\tMoving the tailing to " + str(sel_dloc)
-        body_code_ds += self.gen_deliver_sample(3, dloc_x, dloc_y, msg=msg)
+        body_code_ds += self.gen_deliver(3, dloc_x, dloc_y, msg=msg)
            
         msg = "Digging failed."
         dig_success_condition = "Lookup(DiggingSuccess(" + str(xloc_ep) + "))"
@@ -142,7 +142,7 @@ class PlexilPlanTranslator():
         ground_found_cond = "Lookup(GroundFound)"
         code += self.gen_ground_found_cond(1, body_code, ground_found_cond, plan_status_varname, msg=msg)
 
-        #code += self.gen_stow(1)
+        code += self.gen_stow(1)
         update_node_name = "ExcavationStatus"
         update_msg = {}
         # ToDo: handel literals and variables appropriately
@@ -259,14 +259,14 @@ class PlexilPlanTranslator():
  
         return self.__ident_code(code, pre_dents)
 
-    def gen_deliver_sample(self, tab_num, x, y, z=0.5,  msg=""):
+    def gen_deliver(self, tab_num, x, y, z=0.5,  msg=""):
         pre_dents = self.__gen_ident_str(tab_num)
         code = []
         if msg != "":
             code.append("log_info (\""+ msg + "\");\n")
         else:
             code.append("log_info (\"Delivering the sample...\");\n")
-        code.append("LibraryCall DeliverSample (X = " + str(x) + ", Y = " + str(y) + ", Z = " + str(z) + ");\n\n")
+        code.append("LibraryCall Deliver (X = " + str(x) + ", Y = " + str(y) + ", Z = " + str(z) + ");\n\n")
         
         return self.__ident_code(code, pre_dents)
 

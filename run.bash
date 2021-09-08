@@ -1,9 +1,10 @@
 #!/bin/bash
 
 plexil_plan_name=$1
+fault_ex_prob=$2
 
-xloc_num=10
-dloc_num=5
+xloc_num=8
+dloc_num=6
 
 
 ws_root="/home/jsu/Projects/oceanwaters_ws"
@@ -23,7 +24,7 @@ plexil_plan_plp="${plexil_plan_name}.plp"
 plexil_plan_plx="${plexil_plan_name}.plx"
 
 cd ${syn_dir}
-python run.py --syn_dir "${syn_dir}" --plexil_plan_name "${plexil_plan_name}" --runtime_info_filename rt_info.json --xloc_num "${xloc_num}" --dloc_num "${dloc_num}" --result_dir "${result_dir}" --prism_model_filename ow_planner.prism --prism_preprocessor_filename autonomy-excavate.pp --prism_property_filename excavate.props --faulty_ex_prob 0.2
+python run.py --syn_dir "${syn_dir}" --plexil_plan_name "${plexil_plan_name}" --runtime_info_filename rt_info.json --xloc_num "${xloc_num}" --dloc_num "${dloc_num}" --result_dir "${result_dir}" --prism_model_filename ow_planner.prism --prism_preprocessor_filename autonomy-excavate.pp --prism_property_filename excavate.props --faulty_ex_prob ${fault_ex_prob}
 
 # copy syntheized PLEXIL plan into ../src/plans for compilation
 cd "${result_dir}"

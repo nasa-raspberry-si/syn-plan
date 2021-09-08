@@ -44,10 +44,10 @@ def syn_exca_plan(
     cmd = "cp -r ./prism/* " + result_dir
     os.system(cmd)
 
-    # 1 Generate the run-time information: excavation locations and dump locations
+    # 0 Generate the run-time information: excavation locations and dump locations
     # Based on valid working zone of the arm, generate a pool of valid
     # locations for excavation and dumpping
-    print("\n[Step 1]: Synthesize/Load the run-time information.")
+    print("\n[Step 0]: Synthesize/Load the run-time information.")
     runtime_info_fp_syn = os.path.join(syn_dir, runtime_info_filename)
     if not os.path.exists(runtime_info_fp_syn):
         loc_pool = gen_loc_pool(x_gap=0.2, y_gap=0.1)
@@ -70,8 +70,8 @@ def syn_exca_plan(
     if (faulty_ex_prob >= 0) and (faulty_ex_prob <= 1):
         faults["excavation"] = {"ex_prob": faulty_ex_prob}
 
-    # 2 Generate PRISM model
-    print("\n[Step 2]: Generate PRISM model")
+    # 1 Generate PRISM model
+    print("\n[Step 1]: Generate PRISM model")
     # Placeholder: when the runtime information is provided by another program.
     num_xlocs = len(runtime_info['xloc_list'])
     num_dlocs = len(runtime_info['dloc_list'])
@@ -81,8 +81,8 @@ def syn_exca_plan(
         prism_model_filename, prism_preprocessor_filename)
     prism_generator.generate_prism_model(max_tried)
 
-    # 3 Use PRISM model to extract policy and a plan
-    print("\n[Step 3]: Use PRISM model to extract policy and a plan")
+    # 2 Use PRISM model to extract policy
+    print("\n[Step 2]: Use PRISM model to extract the policy")
     prism_property_fp = os.path.join(result_dir, prism_property_filename)
     prism_model_fp = os.path.join(result_dir, prism_model_filename)
     policy_filename = "policy.adv"
@@ -94,8 +94,9 @@ def syn_exca_plan(
     p_pe = Popen(cmd_policy_extraction, shell=True, stdout=PIPE, stderr=PIPE)
     stdout, stderr = p_pe.communicate()
 
-    # Java program, PrismPolicy.class, should be in the same directory level
+    # 3 Java program, PrismPolicy.class, should be in the same directory level
     # as synplan.py
+    print("\n[Step 3]: Use the policy to generate the synthetic plan")
     cmd_syn_plan = "java PrismPolicy " + policy_fp
     print("[CMD] " + cmd_syn_plan)
     p_sp = Popen(cmd_syn_plan, shell=True, stdout=PIPE, stderr=PIPE)
