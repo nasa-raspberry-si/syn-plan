@@ -118,7 +118,8 @@ class PlexilPlanTranslator():
 
         # Simulate the fault introduced into the excavatability
         if (faulty_ex_prob >=0 ) and (faulty_ex_prob <= 1):
-            msg = "[Fault Injection] A fault has been introduced to the model that esitmate the excavatability. The actual excavatability is " + str(faulty_ex_prob) + " while it is estimated to be " + str(xloc_ep) + "."
+            msg = "[Fault Injection] A fault has been introduced to the model that esitmates the excavatability."
+            msg += " The estimated excavatability is " + str(xloc_ep) + " while the faulty one is " + str(faulty_ex_prob) + "."
             code += self.gen_info(1, msg=msg)
             xloc_ep = faulty_ex_prob
 

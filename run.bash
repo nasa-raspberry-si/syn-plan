@@ -7,7 +7,8 @@ xloc_num=8
 dloc_num=6
 
 
-ws_root="/home/jsu/Projects/oceanwaters_ws"
+ws_root=$(dirname $BASH_SOURCE)/../../../
+echo "[ws_root path] ${ws_root}"
 
 plan_dir="${ws_root}/src/ow_autonomy/src/plans"
 dev_plan_dir="${ws_root}/devel/etc/plexil"
