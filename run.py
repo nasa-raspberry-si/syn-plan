@@ -31,7 +31,8 @@ def syn_exca_plan(
         runtime_info_filename, xloc_num, dloc_num,
         syn_dir, result_dir, prism_model_filename,
         prism_preprocessor_filename, prism_property_filename,
-        max_tried=1, faulty_ex_prob=-1):
+        max_tried=1, faulty_ex_prob=-1,
+        always_new_runtime_info=False):
 
     # Create a directory for holding PRISM model, policy file and PLEXIL plan
     # file.
@@ -49,7 +50,7 @@ def syn_exca_plan(
     # locations for excavation and dumpping
     print("\n[Step 0]: Synthesize/Load the run-time information.")
     runtime_info_fp_syn = os.path.join(syn_dir, runtime_info_filename)
-    if not os.path.exists(runtime_info_fp_syn):
+    if always_new_runtime_info or (not os.path.exists(runtime_info_fp_syn)):
         loc_pool = gen_loc_pool(x_gap=0.2, y_gap=0.1)
         runtime_info_generator = RuntimeInfoExcaGenerator(loc_pool)
         runtime_info_generator.gen_runtime_info(
@@ -183,7 +184,7 @@ def parse_arguments(parser):
         type=float,
         required=False,
         default=-1,
-        help="the changed excavatability by a fault. '-1' means no fault.")
+        help="simulate the drop of excavatability caused by a fault. '-1' means no fault. The excavatability drops to excavatability*faulty_ex_prob.")
     parser.add_argument(
         "--plexil_plan_name",
         type=str,
@@ -195,6 +196,14 @@ def parse_arguments(parser):
         type=str,
         required=True,
         help="the root directory of synthesizing plexil plans")
+
+    parser.add_argument(
+            "--always_new_runtime_info",
+            type=bool,
+            required=False,
+            default=False,
+            help="generate a new runtime info for synthesizing a plan. If it is False, planning will use the existing updated runtime info."
+            )
 
     args = parser.parse_args()
 
@@ -212,6 +221,7 @@ def main(argv):
 
     syn_dir = args_dict['syn_dir']
     runtime_info_filename = args_dict['runtime_info_filename']
+    always_new_runtime_info = args_dict['always_new_runtime_info']
     xloc_num = args_dict['xloc_num']
     dloc_num = args_dict['dloc_num']
     result_dir = args_dict['result_dir']
@@ -226,7 +236,8 @@ def main(argv):
         runtime_info_filename, xloc_num, dloc_num,
         syn_dir, result_dir, prism_model_filename,
         prism_preprocessor_filename, prism_property_filename,
-        max_tried=1, faulty_ex_prob=faulty_ex_prob)
+        max_tried=1, faulty_ex_prob=faulty_ex_prob,
+        always_new_runtime_info = always_new_runtime_info)
 
 
 if __name__ == "__main__":
