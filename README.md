@@ -9,7 +9,7 @@
 
 ## Usage
 ### Command To Run
-`python run.py --runtime_info_filename rt_info.json --xloc_num 8 --dloc_num 6 --result_dir planning_exca_result --prism_model_filename ow_8xloc_6dloc.prism --prism_preprocessor_filename autonomy-excavate.pp --prism_property_filename excavate.props`
+`python run.py --syn_dir ./ --plexil_plan_name Exca --runtime_info_filename rt_info.json --xloc_num 8 --dloc_num 6 --result_dir planning_exca_result --prism_model_filename ow_planner.prism --prism_preprocessor_filename autonomy-excavate.pp --prism_property_filename excavate.props`
 ### Result
 Inside the resulting directory, **planning_exca_result**, there are
    * Synthesized run-time information for the excavation scenarion in **rt_info.json**.
