@@ -1,0 +1,59 @@
+// The following PLEXIL codes are automatically generated during planning.
+
+#include "plan-interface.h"
+
+
+Exca:
+{
+	Boolean planSuccess;
+
+	log_info ("{'sel_xloc': {u'sci_val': 0.04993652513576907, u'position': {u'y': -0.1, u'x': 1.54}, u'ex_prob': 0.9800253899456923, u'name': u'xloc2'}, 'sel_dloc': {u'position': {u'y': -0.4, u'x': 1.51}, u'name': u'dloc3'}, 'node_name': 'Exca'}");
+
+	log_info ("[Fault Injection] A fault has been introduced to the lander system that causes the excavatability, the probability of successful excavation, to drop. The excavatability drops from 0.980025389946 to 0.784020311957.");
+	log_info ("Unstowing arm...");
+	LibraryCall Unstow();
+
+	log_info ("A guarded move to find out the ground position of the location (x=1.54, y=-0.1)...");
+	LibraryCall GuardedMove (
+		X = 1.54, Y = -0.1, Z = 0.05,
+		DirX = 0, DirY = 0, DirZ = 1,
+		SearchDistance = 0.25);
+
+	planSuccess=Lookup(GroundFound);
+	if (planSuccess) {
+		log_info ("Start the excavation using the grind at {u'sci_val': 0.04993652513576907, u'position': {u'y': -0.1, u'x': 1.54}, u'ex_prob': 0.9800253899456923, u'name': u'xloc2'}...");
+		LibraryCall Grind (
+			X = 1.54, Y = -0.1, Depth = 0.05,
+			Length = 0.2, Parallel = true,
+			GroundPos = Lookup(GroundPosition));
+
+		planSuccess=Lookup(DiggingSuccess(0.784020311957));
+		if (planSuccess) {
+			log_info ("Digging successed!");
+			log_info ("Removing tailing...\n\tCollecting the tailing using the scoop...\n");
+			LibraryCall DigCircular (
+				X = 1.54, Y = -0.1, Depth = 0.05,
+				GroundPos = Lookup(GroundPosition),
+				Parallel = true);
+
+			log_info ("\tMoving the tailing to {u'position': {u'y': -0.4, u'x': 1.51}, u'name': u'dloc3'}");
+			LibraryCall Deliver (X = 1.51, Y = -0.4, Z = 0.5);
+
+		}
+		else log_error ("[Condition Failed] Lookup(DiggingSuccess(0.784020311957)): Digging failed.");
+		endif
+
+	}
+	else log_error ("Failed to find ground: Skipping grind and dig.");
+	endif
+
+	log_info ("Stowing arm...");
+	LibraryCall Stow();
+
+	ExcavationStatus:
+	{
+		Update plan_name="Exca", exec_status=planSuccess;
+	}
+
+	log_info ("Excavation is finished.");
+}
