@@ -118,10 +118,10 @@ class PlexilPlanTranslator():
 
         # Simulate the fault introduced into the excavatability
         if (faulty_ex_prob >=0 ) and (faulty_ex_prob <= 1):
-            msg = "[Fault Injection] A fault has been introduced to the model that esitmates the excavatability."
-            msg += " The estimated excavatability is " + str(xloc_ep) + " while the faulty one is " + str(faulty_ex_prob) + "."
+            msg = "[Fault Injection] A fault has been introduced to the lander system that causes the excavatability, the probability of successful excavation, to drop."
+            msg += " The excavatability drops from " + str(xloc_ep) + " to " + str(xloc_ep*faulty_ex_prob) + "."
             code += self.gen_info(1, msg=msg)
-            xloc_ep = faulty_ex_prob
+            xloc_ep = xloc_ep * faulty_ex_prob
 
         code += self.gen_unstow(1)
         code += self.gen_guarded_move(1, xloc_x, xloc_y)
@@ -136,6 +136,7 @@ class PlexilPlanTranslator():
         body_code_ds += self.gen_deliver(3, dloc_x, dloc_y, msg=msg)
            
         msg = "Digging failed."
+        # Simulate the status of digging operation
         dig_success_condition = "Lookup(DiggingSuccess(" + str(xloc_ep) + "))"
         body_code += self.gen_dig_success_cond(2, dig_success_condition, plan_status_varname, body_code_ds, msg=msg)
  
