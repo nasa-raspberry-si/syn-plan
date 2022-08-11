@@ -1,0 +1,81 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Welcome file</title>
+  <link rel="stylesheet" href="https://stackedit.io/style.css" />
+</head>
+
+<body class="stackedit">
+  <div class="stackedit__left">
+    <div class="stackedit__toc">
+      
+<ul>
+<li><a href="#fault-injection">Fault Injection</a>
+<ul>
+<li><a href="#import-libraries">Import Libraries</a></li>
+<li><a href="#selecting-parameters-of-a-distribution">Selecting Parameters of a Distribution**</a></li>
+<li><a href="#selecting-telemetries">Selecting Telemetries</a></li>
+<li><a href="#number-of-faulty-environment">Number of Faulty Environment</a></li>
+<li><a href="#inject-fault">Inject fault</a></li>
+<li><a href="#export-the-faulty-environment">Export the faulty environment</a></li>
+<li><a href="#uml-diagrams">UML diagrams</a></li>
+</ul>
+</li>
+</ul>
+
+    </div>
+  </div>
+  <div class="stackedit__right">
+    <div class="stackedit__html">
+      <h1 id="fault-injection">Fault Injection</h1>
+<p>This module <strong>Fault Injection</strong> is created to insert random faults(errors to be selected from a continuous distribution type) into the telemetries aka <strong>sensors</strong> like – Arm Joint angle, Arm acceleration etc. of <strong>Europa Mission Lander</strong> so that we can train our underlying <strong>causal models</strong> against the abrupt environmental changes on the surface.</p>
+<h2 id="import-libraries">Import Libraries</h2>
+<p>Import necessary libraries</p>
+<h2 id="selecting-parameters-of-a-distribution">Selecting Parameters of a Distribution**</h2>
+<p>The parameters of a <a href="https://variation.com/wp-content/distribution_analyzer_help/hs117.htm">distribution</a> are variables included in the <a href="https://variation.com/wp-content/distribution_analyzer_help/hs116.htm">density function</a> so that the distribution can be adapted to a variety of situations. Of greatest importance is the number of parameters as shown below:</p>
+<p><strong>2 Parameters:</strong> The two parameters determine the <a href="https://variation.com/wp-content/distribution_analyzer_help/hs111.htm">average</a> and <a href="https://variation.com/wp-content/distribution_analyzer_help/hs112.htm">standard deviation</a> of the distribution. Such distributions are represented as a point on a <a href="https://variation.com/wp-content/distribution_analyzer_help/hs135.htm">skewness-kurtosis plot</a> as they have fixed values of the skewness and kurtosis. Examples are the <a href="https://variation.com/wp-content/distribution_analyzer_help/hs121.htm">exponential</a>, <a href="https://variation.com/wp-content/distribution_analyzer_help/hs129.htm">normal</a> and <a href="https://variation.com/wp-content/distribution_analyzer_help/hs131.htm">uniform</a> distributions.</p>
+<p><strong>3 Parameters:</strong> The three parameters determine the average, standard deviation and <a href="https://variation.com/wp-content/distribution_analyzer_help/hs113.htm">skewness</a> of the distribution. Such distributions are represented as a curve on a skewness-kurtosis plot as the kurtosis depends of the skewness. Examples are the <a href="https://variation.com/wp-content/distribution_analyzer_help/hs125.htm">gamma</a> and <a href="https://variation.com/wp-content/distribution_analyzer_help/hs128.htm">lognormal</a> distributions.</p>
+<p><strong>4 Parameters:</strong> The four parameters determine the average, standard deviation, skewness and <a href="https://variation.com/wp-content/distribution_analyzer_help/hs114.htm">kurtosis</a> of the distribution. Such distributions are represented as a region on a skewness-kurtosis plot as they can take on a variety of skewness and kurtosis values. Examples are the <a href="https://variation.com/wp-content/distribution_analyzer_help/hs120.htm">beta</a>, <a href="https://variation.com/wp-content/distribution_analyzer_help/hs126.htm">Johnson</a> and <a href="https://variation.com/wp-content/distribution_analyzer_help/hs130.htm">Pearson</a> distributions.</p>
+<h2 id="selecting-telemetries">Selecting Telemetries</h2>
+<p>Selecting telemetries in which we want to introduce the errors. For now we have <strong>7</strong> telemetries, namely,<br>
+<strong>ARM_FT_FORCE<br>
+ARM_FT_FORCE_2<br>
+ARM_FT_FORCE_3<br>
+ARM_FT_TORQUE<br>
+ARM_JOINT_ACCELERATIONS<br>
+ARM_JOINT_ANGLES<br>
+ARM_JOINT_VELOCITIES<br>
+PT_POS<br>
+Tilt_POS</strong></p>
+<h2 id="number-of-faulty-environment">Number of Faulty Environment</h2>
+<p>Choose how many faulty environments need to be created</p>
+<h2 id="inject-fault">Inject fault</h2>
+<p>Inject faults into the selected telemetries and generate environment</p>
+<h2 id="export-the-faulty-environment">Export the faulty environment</h2>
+<p>Export the faulty environment to the desired location, use the faulty environment to enhace the robustness of the models.</p>
+<ul>
+<li>
+<p>Store.</p>
+<blockquote>
+<p>Store environments with modified telemetries.</p>
+</blockquote>
+</li>
+<li>
+<p>Call.</p>
+<blockquote>
+<p>Call these modified environments whenever necessary.</p>
+</blockquote>
+</li>
+</ul>
+<h2 id="uml-diagrams">UML diagrams</h2>
+<p><strong>Flow chart:</strong></p>
+<pre class=" language-mermaid"><svg id="mermaid-svg-qFakOoG9mShGQkW2" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="262.8924865722656" style="max-width: 689.9549560546875px;" viewBox="0 0.00002288818359375 689.9549560546875 262.8924865722656"><style>#mermaid-svg-qFakOoG9mShGQkW2{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#000000;}#mermaid-svg-qFakOoG9mShGQkW2 .error-icon{fill:#552222;}#mermaid-svg-qFakOoG9mShGQkW2 .error-text{fill:#552222;stroke:#552222;}#mermaid-svg-qFakOoG9mShGQkW2 .edge-thickness-normal{stroke-width:2px;}#mermaid-svg-qFakOoG9mShGQkW2 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-svg-qFakOoG9mShGQkW2 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-svg-qFakOoG9mShGQkW2 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-svg-qFakOoG9mShGQkW2 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-svg-qFakOoG9mShGQkW2 .marker{fill:#666;stroke:#666;}#mermaid-svg-qFakOoG9mShGQkW2 .marker.cross{stroke:#666;}#mermaid-svg-qFakOoG9mShGQkW2 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-svg-qFakOoG9mShGQkW2 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#000000;}#mermaid-svg-qFakOoG9mShGQkW2 .cluster-label text{fill:#333;}#mermaid-svg-qFakOoG9mShGQkW2 .cluster-label span{color:#333;}#mermaid-svg-qFakOoG9mShGQkW2 .label text,#mermaid-svg-qFakOoG9mShGQkW2 span{fill:#000000;color:#000000;}#mermaid-svg-qFakOoG9mShGQkW2 .node rect,#mermaid-svg-qFakOoG9mShGQkW2 .node circle,#mermaid-svg-qFakOoG9mShGQkW2 .node ellipse,#mermaid-svg-qFakOoG9mShGQkW2 .node polygon,#mermaid-svg-qFakOoG9mShGQkW2 .node path{fill:#eee;stroke:#999;stroke-width:1px;}#mermaid-svg-qFakOoG9mShGQkW2 .node .label{text-align:center;}#mermaid-svg-qFakOoG9mShGQkW2 .node.clickable{cursor:pointer;}#mermaid-svg-qFakOoG9mShGQkW2 .arrowheadPath{fill:#333333;}#mermaid-svg-qFakOoG9mShGQkW2 .edgePath .path{stroke:#666;stroke-width:1.5px;}#mermaid-svg-qFakOoG9mShGQkW2 .flowchart-link{stroke:#666;fill:none;}#mermaid-svg-qFakOoG9mShGQkW2 .edgeLabel{background-color:white;text-align:center;}#mermaid-svg-qFakOoG9mShGQkW2 .edgeLabel rect{opacity:0.5;background-color:white;fill:white;}#mermaid-svg-qFakOoG9mShGQkW2 .cluster rect{fill:hsl(210,66.6666666667%,95%);stroke:#26a;stroke-width:1px;}#mermaid-svg-qFakOoG9mShGQkW2 .cluster text{fill:#333;}#mermaid-svg-qFakOoG9mShGQkW2 .cluster span{color:#333;}#mermaid-svg-qFakOoG9mShGQkW2 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(-160,0%,93.3333333333%);border:1px solid #26a;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-svg-qFakOoG9mShGQkW2:root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#mermaid-svg-qFakOoG9mShGQkW2 flowchart{fill:apa;}</style><g><g class="output"><g class="clusters"></g><g class="edgePaths"><g class="edgePath LS-A LE-B" id="L-A-B" style="opacity: 1;"><path class="path" d="M133.375,131.44625091552734L207.3125,131.44625091552734L281.25,131.44625091552734" marker-end="url(https://stackedit.io/app#arrowhead384)" style="fill:none"></path><defs><marker id="arrowhead384" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g><g class="edgePath LS-B LE-D" id="L-B-D" style="opacity: 1;"><path class="path" d="M385.0625,131.44625091552734L410.0625,131.44625091552734L435.56250028610225,131.94625091552734" marker-end="url(https://stackedit.io/app#arrowhead385)" style="fill:none"></path><defs><marker id="arrowhead385" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="strokeWidth" markerWidth="8" markerHeight="6" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowheadPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"></path></marker></defs></g></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(207.3125,131.44625091552734)" style="opacity: 1;"><g transform="translate(-48.9375,-13.356249809265137)" class="label"><rect rx="0" ry="0" width="97.875" height="26.712499618530273"></rect><foreignObject width="97.875" height="26.712499618530273"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span id="L-L-A-B" class="edgeLabel L-LS-A' L-LE-B">Random Error</span></div></foreignObject></g></g><g class="edgeLabel" transform="" style="opacity: 1;"><g transform="translate(0,0)" class="label"><rect rx="0" ry="0" width="0" height="0"></rect><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;"><span id="L-L-B-D" class="edgeLabel L-LS-B' L-LE-D"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="flowchart-A-1554" transform="translate(70.6875,131.44625091552734)" style="opacity: 1;"><rect rx="0" ry="0" x="-62.6875" y="-23.356249809265137" width="125.375" height="46.71249961853027" class="label-container"></rect><g class="label" transform="translate(0,0)"><g transform="translate(-52.6875,-13.356249809265137)"><foreignObject width="105.375" height="26.712499618530273"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Fault Injection</div></foreignObject></g></g></g><g class="node default" id="flowchart-B-1555" transform="translate(333.15625,131.44625091552734)" style="opacity: 1;"><circle x="-51.90625" y="-23.356249809265137" r="51.90625" class="label-container"></circle><g class="label" transform="translate(0,0)"><g transform="translate(-41.90625,-13.356249809265137)"><foreignObject width="83.8125" height="26.712499618530273"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Telemetries</div></foreignObject></g></g></g><g class="node default" id="flowchart-D-1557" transform="translate(558.5087509155273,131.44625091552734)" style="opacity: 1;"><polygon points="123.44625120162964,0 246.89250240325927,-123.44625120162964 123.44625120162964,-246.89250240325927 0,-123.44625120162964" transform="translate(-123.44625120162964,123.44625120162964)" class="label-container"></polygon><g class="label" transform="translate(0,0)"><g transform="translate(-103.8062515258789,-13.356249809265137)"><foreignObject width="207.6125030517578" height="26.712499618530273"><div xmlns="http://www.w3.org/1999/xhtml" style="display: inline-block; white-space: nowrap;">Robust Causal  Model Training</div></foreignObject></g></g></g></g></g></g></svg></pre>
+
+    </div>
+  </div>
+</body>
+
+</html>
